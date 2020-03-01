@@ -54,7 +54,7 @@
 <meta property="og:description" content="Once a XGBoost model is trained, we would like to use PySpark for batch predictions. The method we use here is through Pandas UDF. Why pandas_udf Instead of udfFor a udf function, PySpark evaluates it">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-03-01T13:14:00.000Z">
-<meta property="article:modified_time" content="2020-03-01T13:57:34.133Z">
+<meta property="article:modified_time" content="2020-03-01T14:05:06.277Z">
 <meta property="article:author" content="MunHou">
 <meta property="article:tag" content="Machine Learning">
 <meta property="article:tag" content="PySpark">
@@ -212,7 +212,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2020-03-01 13:14:00 / Modified: 13:57:34" itemprop="dateCreated datePublished" datetime="2020-03-01T13:14:00+00:00">2020-03-01</time>
+              <time title="Created: 2020-03-01 13:14:00 / Modified: 14:05:06" itemprop="dateCreated datePublished" datetime="2020-03-01T13:14:00+00:00">2020-03-01</time>
             </span>
 
           
@@ -275,9 +275,13 @@
 <p>After that, we convert it into a 2D numpy array:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">array([[149. ,  84. ,  38.5,  79.7],</span><br><span class="line">       [  2.5,  34. ,  35.5,  97.6],</span><br><span class="line">       [  0. ,  65.3,  58.7,  45.7]])</span><br></pre></td></tr></table></figure>
 
-<p>Finally, we initialise a <code>DMatrix</code> object with the 2D numpy array we just created. We then run the prediction. As a <code>pandas_udf</code> requires a <code>Series</code> object to return, we convert the prediction scores into a <code>Series</code> at the last line.</p>
-<p>Using a <code>pandas_udf</code> function is just like how we use a normal <code>udf</code> function:</p>
+<p>Finally, we initialise a <code>DMatrix</code> object with the 2D numpy array we just created. We then run the prediction. As a <code>pandas_udf</code> requires a <code>Series</code> object to return, we convert the prediction scores into a <code>Series</code> at the line 16.</p>
+<h2 id="Using-a-pandas-udf-Function"><a href="#Using-a-pandas-udf-Function" class="headerlink" title="Using a pandas_udf Function"></a>Using a <code>pandas_udf</code> Function</h2><p>Using a <code>pandas_udf</code> function is just like how we use a normal <code>udf</code> function:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.withColumn(<span class="string">'prediction'</span>, get_prediction_result(<span class="string">'features'</span>))</span><br></pre></td></tr></table></figure>
+
+
+<p>That’s how we integrate the XGBoost batch prediction into our PySpark pipeline.</p>
+
     </div>
 
     
@@ -366,7 +370,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Why-pandas-udf-Instead-of-udf"><span class="nav-number">1.</span> <span class="nav-text">Why pandas_udf Instead of udf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Create-a-pandas-udf-Prediction-Function"><span class="nav-number">2.</span> <span class="nav-text">Create a pandas_udf Prediction Function</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Why-pandas-udf-Instead-of-udf"><span class="nav-number">1.</span> <span class="nav-text">Why pandas_udf Instead of udf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Create-a-pandas-udf-Prediction-Function"><span class="nav-number">2.</span> <span class="nav-text">Create a pandas_udf Prediction Function</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Using-a-pandas-udf-Function"><span class="nav-number">3.</span> <span class="nav-text">Using a pandas_udf Function</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
