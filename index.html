@@ -182,6 +182,160 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog.munhou.com/2020/04/06/Pytorch-Implementation-of-Deep-Packet-A-Novel-Approach-For-Encrypted-Tra%EF%AC%83c-Classi%EF%AC%81cation-Using-Deep-Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="MunHou">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mun Hou's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/06/Pytorch-Implementation-of-Deep-Packet-A-Novel-Approach-For-Encrypted-Tra%EF%AC%83c-Classi%EF%AC%81cation-Using-Deep-Learning/" class="post-title-link" itemprop="url">Pytorch Implementation of Deep Packet: A Novel Approach For Encrypted Traﬃc Classiﬁcation Using Deep Learning</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-04-06 03:29:00 / Modified: 07:51:42" itemprop="dateCreated datePublished" datetime="2020-04-06T03:29:00+00:00">2020-04-06</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/2020/04/06/Pytorch-Implementation-of-Deep-Packet-A-Novel-Approach-For-Encrypted-Tra%EF%AC%83c-Classi%EF%AC%81cation-Using-Deep-Learning/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/06/Pytorch-Implementation-of-Deep-Packet-A-Novel-Approach-For-Encrypted-Traﬃc-Classiﬁcation-Using-Deep-Learning/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Why-Traffic-Classification"><a href="#Why-Traffic-Classification" class="headerlink" title="Why Traffic Classification"></a>Why Traffic Classification</h2><p>The authors explained that network traffic classification attracts many interests in both academia and industrial area is because it is one of the prerequisites for advanced network management task. Network architecture today is designed to be asymmetric, based on the assumption that clients demand download more than upload. However, this assumption doesn’t hold anymore due to the rise of voice over IP (VoIP), P2P, and other symmetric-demand application. Network providers require the knowledge of the application their clients used to allocate adequate resources.</p>
+<h2 id="Related-Works"><a href="#Related-Works" class="headerlink" title="Related Works"></a>Related Works</h2><p>The authors categorised network classification methods into three categories: (1) port-based (2) payload inspection, and (3) statistical machine learning. The summary of the pros and cons of these methods are as below:</p>
+<ol>
+<li><p>Port-based: classifies traffic by the port number in TCP/UDP header</p>
+<ul>
+<li>Pros: Fast</li>
+<li>Cons: Inaccurate, due to port obfuscation, network address translation (NAT), port forwarding, protocol embedding, and random ports assignment</li>
+</ul>
+</li>
+<li><p>Payload inspection: analyse the payload in the application layer</p>
+<ul>
+<li>Pros: Accurate</li>
+<li>Cons: Pattern-based. Needs to update patterns each time a new protocol is released. Another issue is that this method raises user privacy concern. </li>
+</ul>
+</li>
+<li><p>Statistical and machine learning: use statistical features of traffic to train a model</p>
+<ul>
+<li>Pros: Accurate</li>
+<li>Cons: Expensive and inefficient as it needs human involved hand-craft features. Slow execution of machine learning model is another concern.</li>
+</ul>
+</li>
+</ol>
+<h2 id="Dataset"><a href="#Dataset" class="headerlink" title="Dataset"></a>Dataset</h2><p>They used the <a href="https://www.unb.ca/cic/datasets/vpn.html" target="_blank" rel="noopener">VPN-nonVPN dataset (ISCXVPN2016)</a>. This dataset was captured at the data-link layer. Hence each packet contains an Ethernet header, an IP header, and a TCP/UDP header.</p>
+<h2 id="Pre-processing"><a href="#Pre-processing" class="headerlink" title="Pre-processing"></a>Pre-processing</h2><p>During the pre-processing phase, the authors</p>
+<ol>
+<li>Remove Ethernet header</li>
+<li>Pad traffic with UDP header with zeros to the length of 20 bytes</li>
+<li>Mask the IP in the IP header</li>
+<li>Remove irrelevant packets such as packets with no payload or DNS packets</li>
+<li>Convert the raw packet into a bytes vector</li>
+<li>Truncate the vector of size more than 1500, pad zeros for the byte vector less than 1500</li>
+<li>Normalise the bytes vector by dividing each element by 255</li>
+</ol>
+<p>I used <a href="https://scapy.readthedocs.io/en/latest/introduction.html" target="_blank" rel="noopener">Scapy</a> to modify the packets.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">remove_ether_header</span><span class="params">(packet)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> Ether <span class="keyword">in</span> packet:</span><br><span class="line">        <span class="keyword">return</span> packet[Ether].payload</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> packet</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mask_ip</span><span class="params">(packet)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> IP <span class="keyword">in</span> packet:</span><br><span class="line">        packet[IP].src = <span class="string">'0.0.0.0'</span></span><br><span class="line">        packet[IP].dst = <span class="string">'0.0.0.0'</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> packet</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pad_udp</span><span class="params">(packet)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> UDP <span class="keyword">in</span> packet:</span><br><span class="line">        <span class="comment"># get layers after udp</span></span><br><span class="line">        layer_after = packet[UDP].payload.copy()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># build a padding layer</span></span><br><span class="line">        pad = Padding()</span><br><span class="line">        pad.load = <span class="string">'\x00'</span> * <span class="number">12</span></span><br><span class="line"></span><br><span class="line">        layer_before = packet.copy()</span><br><span class="line">        layer_before[UDP].remove_payload()</span><br><span class="line">        packet = layer_before / pad / layer_after</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> packet</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> packet</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">should_omit_packet</span><span class="params">(packet)</span>:</span></span><br><span class="line">    <span class="comment"># SYN, ACK or FIN flags set to 1 and no payload</span></span><br><span class="line">    <span class="keyword">if</span> TCP <span class="keyword">in</span> packet <span class="keyword">and</span> (packet.flags &amp; <span class="number">0x13</span>):</span><br><span class="line">        <span class="comment"># not payload or contains only padding</span></span><br><span class="line">        layers = packet[TCP].payload.layers()</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> layers <span class="keyword">or</span> (Padding <span class="keyword">in</span> layers <span class="keyword">and</span> len(layers) == <span class="number">1</span>):</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># DNS segment</span></span><br><span class="line">    <span class="keyword">if</span> DNS <span class="keyword">in</span> packet:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="Deep-Packet"><a href="#Deep-Packet" class="headerlink" title="Deep Packet"></a>Deep Packet</h2><p>The authors proposed two models. One is CNN, and another is SAE. I only implemented the CNN model, so I introduce only their CNN architecture here.</p>
+<p><img src="/images/deep-packet/cnn.png" alt=""></p>
+<p>The input of their CNN model is a vector of size 1,500. It consists of two consecutive 1-D convolutional layers, followed by a max-pooling layer. Afterwards, the tensor will be flattened and fed into 4 fully connected layers, while the last layer acts as the softmax classifier. The revealed hyperparameters of their convolutional layers, which are</p>
+<p><img src="/images/deep-packet/cnn_hyperparameter.png" alt=""></p>
+<p>However, they didn’t mention the kernel size of the max-pooling layer and the sizes of three dense layers. I set the kernel size to 2, while for the dense layers, I use the setting of the last three layers of their SAE model, which are 200, 100, and 50.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CNN</span><span class="params">(LightningModule)</span>:</span></span><br><span class="line">        <span class="comment"># two convolution, then one max pool</span></span><br><span class="line">        self.conv1 = nn.Sequential(</span><br><span class="line">            nn.Conv1d(</span><br><span class="line">                in_channels=<span class="number">1</span>,</span><br><span class="line">                out_channels=self.hparams.c1_output_dim,</span><br><span class="line">                kernel_size=self.hparams.c1_kernel_size,</span><br><span class="line">                stride=self.hparams.c1_stride</span><br><span class="line">            ),</span><br><span class="line">            nn.ReLU()</span><br><span class="line">        )</span><br><span class="line">        self.conv2 = nn.Sequential(</span><br><span class="line">            nn.Conv1d(</span><br><span class="line">                in_channels=self.hparams.c1_output_dim,</span><br><span class="line">                out_channels=self.hparams.c2_output_dim,</span><br><span class="line">                kernel_size=self.hparams.c2_kernel_size,</span><br><span class="line">                stride=self.hparams.c2_stride</span><br><span class="line">            ),</span><br><span class="line">            nn.ReLU()</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        self.max_pool = nn.MaxPool1d(</span><br><span class="line">            kernel_size=<span class="number">2</span></span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        <span class="comment"># flatten, calculate the output size of max pool</span></span><br><span class="line">        <span class="comment"># use a dummy input to calculate</span></span><br><span class="line">        dummy_x = torch.rand(<span class="number">1</span>, <span class="number">1</span>, self.hparams.signal_length, requires_grad=<span class="literal">False</span>)</span><br><span class="line">        dummy_x = self.conv1(dummy_x)</span><br><span class="line">        dummy_x = self.conv2(dummy_x)</span><br><span class="line">        dummy_x = self.max_pool(dummy_x)</span><br><span class="line">        max_pool_out = dummy_x.view(<span class="number">1</span>, <span class="number">-1</span>).shape[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">        <span class="comment"># followed by 5 dense layers</span></span><br><span class="line">        self.fc1 = nn.Sequential(</span><br><span class="line">            nn.Linear(</span><br><span class="line">                in_features=max_pool_out,</span><br><span class="line">                out_features=<span class="number">200</span></span><br><span class="line">            ),</span><br><span class="line">            nn.Dropout(p=<span class="number">0.05</span>),</span><br><span class="line">            nn.ReLU()</span><br><span class="line">        )</span><br><span class="line">        self.fc2 = nn.Sequential(</span><br><span class="line">            nn.Linear(</span><br><span class="line">                in_features=<span class="number">200</span>,</span><br><span class="line">                out_features=<span class="number">100</span></span><br><span class="line">            ),</span><br><span class="line">            nn.Dropout(p=<span class="number">0.05</span>),</span><br><span class="line">            nn.ReLU()</span><br><span class="line">        )</span><br><span class="line">        self.fc3 = nn.Sequential(</span><br><span class="line">            nn.Linear(</span><br><span class="line">                in_features=<span class="number">100</span>,</span><br><span class="line">                out_features=<span class="number">50</span></span><br><span class="line">            ),</span><br><span class="line">            nn.Dropout(p=<span class="number">0.05</span>),</span><br><span class="line">            nn.ReLU()</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        <span class="comment"># finally, output layer</span></span><br><span class="line">        self.out = nn.Linear(</span><br><span class="line">            in_features=<span class="number">50</span>,</span><br><span class="line">            out_features=self.hparams.output_dim</span><br><span class="line">        )</span><br></pre></td></tr></table></figure>
+
+<h2 id="Create-Train-and-Test-Data"><a href="#Create-Train-and-Test-Data" class="headerlink" title="Create Train and Test Data"></a>Create Train and Test Data</h2><p>For each of the application and traffic classification tasks, the dataset is first stratified split into train set and test set with the ratio of 80:20, then each class in the train set are rebalanced by under-sampling. I used all data in the application classification task, but for the traffic classification task, I used only certain apps traffic in each traffic category. This is because I do not know the traffic category of certain apps which are not mentioned in the dataset description page. The applications I used for the traffic classification task are as follow:</p>
+<table>
+<thead>
+<tr>
+<th>Traffic Category</th>
+<th>Applications</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Email</td>
+<td>SMPTS, POP3S and IMAPS</td>
+</tr>
+<tr>
+<td>Chat</td>
+<td>ICQ, AIM, Skype, Facebook and Hangouts</td>
+</tr>
+<tr>
+<td>Streaming</td>
+<td>Vimeo and Youtube</td>
+</tr>
+<tr>
+<td>File Transfer</td>
+<td>Skype, FTPS and SFTP</td>
+</tr>
+<tr>
+<td>VoIP</td>
+<td>Facebook, Skype and Hangouts voice calls</td>
+</tr>
+<tr>
+<td>Torrent</td>
+<td>uTorrent and Transmission (Bittorrent)</td>
+</tr>
+</tbody></table>
+<h2 id="Evaluation-Result"><a href="#Evaluation-Result" class="headerlink" title="Evaluation Result"></a>Evaluation Result</h2><p><img src="/images/deep-packet/cnn_app_classification.png" alt=""><br>Application classification</p>
+<p><img src="/images/deep-packet/cnn_traffic_classification.png" alt=""><br>Traffic classification</p>
+<p>The model performance is closed but not as good as they claimed. This is probably due to the difference between the composition of the train set and the hyperparameter settings.</p>
+<h2 id="Data-Model-and-Code"><a href="#Data-Model-and-Code" class="headerlink" title="Data Model and Code"></a>Data Model and Code</h2><p>You can download the train and test set I created at <a href="https://drive.google.com/file/d/1ID-iFRnEOahH4zsDU7PmdAv4_833lLZo/view?usp=sharing" target="_blank" rel="noopener">here</a> and clone the code from <a href="https://github.com/mhwong2007/Deep-Packet" target="_blank" rel="noopener">Github</a>.</p>
+<p>Pre-trained models are available at <a href="https://drive.google.com/file/d/1f0zjzuerhbWmXrgob7uDGQt-fdZrJ50V/view?usp=sharing" target="_blank" rel="noopener">here</a>.</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
     <link itemprop="mainEntityOfPage" href="https://blog.munhou.com/2020/03/01/ML-Prediction-with-XGBoost-and-PySpark/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -277,6 +431,78 @@
 
 <p>That’s how we integrate the XGBoost batch prediction into our PySpark pipeline.</p>
 
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog.munhou.com/2020/02/10/Hyperparameters-Optimisation-with-Hyperopt-and-MLFlow-for-Tracking/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="MunHou">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mun Hou's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/10/Hyperparameters-Optimisation-with-Hyperopt-and-MLFlow-for-Tracking/" class="post-title-link" itemprop="url">Hyperparameters Optimisation with Hyperopt and MLFlow for Tracking</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-02-10 08:49:00 / Modified: 08:50:34" itemprop="dateCreated datePublished" datetime="2020-02-10T08:49:00+00:00">2020-02-10</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/2020/02/10/Hyperparameters-Optimisation-with-Hyperopt-and-MLFlow-for-Tracking/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/10/Hyperparameters-Optimisation-with-Hyperopt-and-MLFlow-for-Tracking/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
       
     </div>
 
@@ -533,14 +759,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
