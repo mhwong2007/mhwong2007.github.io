@@ -207,7 +207,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2020-04-06 03:29:00 / Modified: 07:51:42" itemprop="dateCreated datePublished" datetime="2020-04-06T03:29:00+00:00">2020-04-06</time>
+              <time title="Created: 2020-04-06 03:29:00 / Modified: 08:16:31" itemprop="dateCreated datePublished" datetime="2020-04-06T03:29:00+00:00">2020-04-06</time>
             </span>
 
           
@@ -236,88 +236,14 @@
 
       
           <h2 id="Why-Traffic-Classification"><a href="#Why-Traffic-Classification" class="headerlink" title="Why Traffic Classification"></a>Why Traffic Classification</h2><p>The authors explained that network traffic classification attracts many interests in both academia and industrial area is because it is one of the prerequisites for advanced network management task. Network architecture today is designed to be asymmetric, based on the assumption that clients demand download more than upload. However, this assumption doesn’t hold anymore due to the rise of voice over IP (VoIP), P2P, and other symmetric-demand application. Network providers require the knowledge of the application their clients used to allocate adequate resources.</p>
-<h2 id="Related-Works"><a href="#Related-Works" class="headerlink" title="Related Works"></a>Related Works</h2><p>The authors categorised network classification methods into three categories: (1) port-based (2) payload inspection, and (3) statistical machine learning. The summary of the pros and cons of these methods are as below:</p>
-<ol>
-<li><p>Port-based: classifies traffic by the port number in TCP/UDP header</p>
-<ul>
-<li>Pros: Fast</li>
-<li>Cons: Inaccurate, due to port obfuscation, network address translation (NAT), port forwarding, protocol embedding, and random ports assignment</li>
-</ul>
-</li>
-<li><p>Payload inspection: analyse the payload in the application layer</p>
-<ul>
-<li>Pros: Accurate</li>
-<li>Cons: Pattern-based. Needs to update patterns each time a new protocol is released. Another issue is that this method raises user privacy concern. </li>
-</ul>
-</li>
-<li><p>Statistical and machine learning: use statistical features of traffic to train a model</p>
-<ul>
-<li>Pros: Accurate</li>
-<li>Cons: Expensive and inefficient as it needs human involved hand-craft features. Slow execution of machine learning model is another concern.</li>
-</ul>
-</li>
-</ol>
-<h2 id="Dataset"><a href="#Dataset" class="headerlink" title="Dataset"></a>Dataset</h2><p>They used the <a href="https://www.unb.ca/cic/datasets/vpn.html" target="_blank" rel="noopener">VPN-nonVPN dataset (ISCXVPN2016)</a>. This dataset was captured at the data-link layer. Hence each packet contains an Ethernet header, an IP header, and a TCP/UDP header.</p>
-<h2 id="Pre-processing"><a href="#Pre-processing" class="headerlink" title="Pre-processing"></a>Pre-processing</h2><p>During the pre-processing phase, the authors</p>
-<ol>
-<li>Remove Ethernet header</li>
-<li>Pad traffic with UDP header with zeros to the length of 20 bytes</li>
-<li>Mask the IP in the IP header</li>
-<li>Remove irrelevant packets such as packets with no payload or DNS packets</li>
-<li>Convert the raw packet into a bytes vector</li>
-<li>Truncate the vector of size more than 1500, pad zeros for the byte vector less than 1500</li>
-<li>Normalise the bytes vector by dividing each element by 255</li>
-</ol>
-<p>I used <a href="https://scapy.readthedocs.io/en/latest/introduction.html" target="_blank" rel="noopener">Scapy</a> to modify the packets.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">remove_ether_header</span><span class="params">(packet)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> Ether <span class="keyword">in</span> packet:</span><br><span class="line">        <span class="keyword">return</span> packet[Ether].payload</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> packet</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mask_ip</span><span class="params">(packet)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> IP <span class="keyword">in</span> packet:</span><br><span class="line">        packet[IP].src = <span class="string">'0.0.0.0'</span></span><br><span class="line">        packet[IP].dst = <span class="string">'0.0.0.0'</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> packet</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pad_udp</span><span class="params">(packet)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> UDP <span class="keyword">in</span> packet:</span><br><span class="line">        <span class="comment"># get layers after udp</span></span><br><span class="line">        layer_after = packet[UDP].payload.copy()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># build a padding layer</span></span><br><span class="line">        pad = Padding()</span><br><span class="line">        pad.load = <span class="string">'\x00'</span> * <span class="number">12</span></span><br><span class="line"></span><br><span class="line">        layer_before = packet.copy()</span><br><span class="line">        layer_before[UDP].remove_payload()</span><br><span class="line">        packet = layer_before / pad / layer_after</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> packet</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> packet</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">should_omit_packet</span><span class="params">(packet)</span>:</span></span><br><span class="line">    <span class="comment"># SYN, ACK or FIN flags set to 1 and no payload</span></span><br><span class="line">    <span class="keyword">if</span> TCP <span class="keyword">in</span> packet <span class="keyword">and</span> (packet.flags &amp; <span class="number">0x13</span>):</span><br><span class="line">        <span class="comment"># not payload or contains only padding</span></span><br><span class="line">        layers = packet[TCP].payload.layers()</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> layers <span class="keyword">or</span> (Padding <span class="keyword">in</span> layers <span class="keyword">and</span> len(layers) == <span class="number">1</span>):</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># DNS segment</span></span><br><span class="line">    <span class="keyword">if</span> DNS <span class="keyword">in</span> packet:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></figure>
-
-
-<h2 id="Deep-Packet"><a href="#Deep-Packet" class="headerlink" title="Deep Packet"></a>Deep Packet</h2><p>The authors proposed two models. One is CNN, and another is SAE. I only implemented the CNN model, so I introduce only their CNN architecture here.</p>
-<p><img src="/images/deep-packet/cnn.png" alt=""></p>
-<p>The input of their CNN model is a vector of size 1,500. It consists of two consecutive 1-D convolutional layers, followed by a max-pooling layer. Afterwards, the tensor will be flattened and fed into 4 fully connected layers, while the last layer acts as the softmax classifier. The revealed hyperparameters of their convolutional layers, which are</p>
-<p><img src="/images/deep-packet/cnn_hyperparameter.png" alt=""></p>
-<p>However, they didn’t mention the kernel size of the max-pooling layer and the sizes of three dense layers. I set the kernel size to 2, while for the dense layers, I use the setting of the last three layers of their SAE model, which are 200, 100, and 50.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CNN</span><span class="params">(LightningModule)</span>:</span></span><br><span class="line">        <span class="comment"># two convolution, then one max pool</span></span><br><span class="line">        self.conv1 = nn.Sequential(</span><br><span class="line">            nn.Conv1d(</span><br><span class="line">                in_channels=<span class="number">1</span>,</span><br><span class="line">                out_channels=self.hparams.c1_output_dim,</span><br><span class="line">                kernel_size=self.hparams.c1_kernel_size,</span><br><span class="line">                stride=self.hparams.c1_stride</span><br><span class="line">            ),</span><br><span class="line">            nn.ReLU()</span><br><span class="line">        )</span><br><span class="line">        self.conv2 = nn.Sequential(</span><br><span class="line">            nn.Conv1d(</span><br><span class="line">                in_channels=self.hparams.c1_output_dim,</span><br><span class="line">                out_channels=self.hparams.c2_output_dim,</span><br><span class="line">                kernel_size=self.hparams.c2_kernel_size,</span><br><span class="line">                stride=self.hparams.c2_stride</span><br><span class="line">            ),</span><br><span class="line">            nn.ReLU()</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        self.max_pool = nn.MaxPool1d(</span><br><span class="line">            kernel_size=<span class="number">2</span></span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        <span class="comment"># flatten, calculate the output size of max pool</span></span><br><span class="line">        <span class="comment"># use a dummy input to calculate</span></span><br><span class="line">        dummy_x = torch.rand(<span class="number">1</span>, <span class="number">1</span>, self.hparams.signal_length, requires_grad=<span class="literal">False</span>)</span><br><span class="line">        dummy_x = self.conv1(dummy_x)</span><br><span class="line">        dummy_x = self.conv2(dummy_x)</span><br><span class="line">        dummy_x = self.max_pool(dummy_x)</span><br><span class="line">        max_pool_out = dummy_x.view(<span class="number">1</span>, <span class="number">-1</span>).shape[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">        <span class="comment"># followed by 5 dense layers</span></span><br><span class="line">        self.fc1 = nn.Sequential(</span><br><span class="line">            nn.Linear(</span><br><span class="line">                in_features=max_pool_out,</span><br><span class="line">                out_features=<span class="number">200</span></span><br><span class="line">            ),</span><br><span class="line">            nn.Dropout(p=<span class="number">0.05</span>),</span><br><span class="line">            nn.ReLU()</span><br><span class="line">        )</span><br><span class="line">        self.fc2 = nn.Sequential(</span><br><span class="line">            nn.Linear(</span><br><span class="line">                in_features=<span class="number">200</span>,</span><br><span class="line">                out_features=<span class="number">100</span></span><br><span class="line">            ),</span><br><span class="line">            nn.Dropout(p=<span class="number">0.05</span>),</span><br><span class="line">            nn.ReLU()</span><br><span class="line">        )</span><br><span class="line">        self.fc3 = nn.Sequential(</span><br><span class="line">            nn.Linear(</span><br><span class="line">                in_features=<span class="number">100</span>,</span><br><span class="line">                out_features=<span class="number">50</span></span><br><span class="line">            ),</span><br><span class="line">            nn.Dropout(p=<span class="number">0.05</span>),</span><br><span class="line">            nn.ReLU()</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        <span class="comment"># finally, output layer</span></span><br><span class="line">        self.out = nn.Linear(</span><br><span class="line">            in_features=<span class="number">50</span>,</span><br><span class="line">            out_features=self.hparams.output_dim</span><br><span class="line">        )</span><br></pre></td></tr></table></figure>
-
-<h2 id="Create-Train-and-Test-Data"><a href="#Create-Train-and-Test-Data" class="headerlink" title="Create Train and Test Data"></a>Create Train and Test Data</h2><p>For each of the application and traffic classification tasks, the dataset is first stratified split into train set and test set with the ratio of 80:20, then each class in the train set are rebalanced by under-sampling. I used all data in the application classification task, but for the traffic classification task, I used only certain apps traffic in each traffic category. This is because I do not know the traffic category of certain apps which are not mentioned in the dataset description page. The applications I used for the traffic classification task are as follow:</p>
-<table>
-<thead>
-<tr>
-<th>Traffic Category</th>
-<th>Applications</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Email</td>
-<td>SMPTS, POP3S and IMAPS</td>
-</tr>
-<tr>
-<td>Chat</td>
-<td>ICQ, AIM, Skype, Facebook and Hangouts</td>
-</tr>
-<tr>
-<td>Streaming</td>
-<td>Vimeo and Youtube</td>
-</tr>
-<tr>
-<td>File Transfer</td>
-<td>Skype, FTPS and SFTP</td>
-</tr>
-<tr>
-<td>VoIP</td>
-<td>Facebook, Skype and Hangouts voice calls</td>
-</tr>
-<tr>
-<td>Torrent</td>
-<td>uTorrent and Transmission (Bittorrent)</td>
-</tr>
-</tbody></table>
-<h2 id="Evaluation-Result"><a href="#Evaluation-Result" class="headerlink" title="Evaluation Result"></a>Evaluation Result</h2><p><img src="/images/deep-packet/cnn_app_classification.png" alt=""><br>Application classification</p>
-<p><img src="/images/deep-packet/cnn_traffic_classification.png" alt=""><br>Traffic classification</p>
-<p>The model performance is closed but not as good as they claimed. This is probably due to the difference between the composition of the train set and the hyperparameter settings.</p>
-<h2 id="Data-Model-and-Code"><a href="#Data-Model-and-Code" class="headerlink" title="Data Model and Code"></a>Data Model and Code</h2><p>You can download the train and test set I created at <a href="https://drive.google.com/file/d/1ID-iFRnEOahH4zsDU7PmdAv4_833lLZo/view?usp=sharing" target="_blank" rel="noopener">here</a> and clone the code from <a href="https://github.com/mhwong2007/Deep-Packet" target="_blank" rel="noopener">Github</a>.</p>
-<p>Pre-trained models are available at <a href="https://drive.google.com/file/d/1f0zjzuerhbWmXrgob7uDGQt-fdZrJ50V/view?usp=sharing" target="_blank" rel="noopener">here</a>.</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/06/Pytorch-Implementation-of-Deep-Packet-A-Novel-Approach-For-Encrypted-Tra%EF%AC%83c-Classi%EF%AC%81cation-Using-Deep-Learning/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -359,10 +285,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-03-01 13:14:00 / Modified: 14:05:06" itemprop="dateCreated datePublished" datetime="2020-03-01T13:14:00+00:00">2020-03-01</time>
+              <time title="Created: 2020-03-01 13:14:00" itemprop="dateCreated datePublished" datetime="2020-03-01T13:14:00+00:00">2020-03-01</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-04-06 08:17:19" itemprop="dateModified" datetime="2020-04-06T08:17:19+00:00">2020-04-06</time>
+              </span>
 
           
   
@@ -391,118 +323,14 @@
       
           <p>Once a XGBoost model is trained, we would like to use PySpark for batch predictions.</p>
 <p>The method we use here is through Pandas UDF.</p>
-<h2 id="Why-pandas-udf-Instead-of-udf"><a href="#Why-pandas-udf-Instead-of-udf" class="headerlink" title="Why pandas_udf Instead of udf"></a>Why <code>pandas_udf</code> Instead of <code>udf</code></h2><p>For a <code>udf</code> function, PySpark evaluates it one record at a time, which is the slowest possible way to execute the prediction. While for a <code>pandas_udf</code> function, it takes a bunch of pandas <code>Series</code> and returns a <code>Series</code>, which is vectorised.</p>
-<h2 id="Create-a-pandas-udf-Prediction-Function"><a href="#Create-a-pandas-udf-Prediction-Function" class="headerlink" title="Create a pandas_udf Prediction Function"></a>Create a <code>pandas_udf</code> Prediction Function</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@pandas_udf(FloatType())</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_prediction_result</span><span class="params">(features)</span>:</span></span><br><span class="line">    <span class="comment"># convert to 2D-numpy array</span></span><br><span class="line">    numpy_array = np.array(</span><br><span class="line">        features</span><br><span class="line">        .values</span><br><span class="line">        .tolist()</span><br><span class="line">    )</span><br><span class="line">    <span class="comment"># convert to xgboost dmatrix</span></span><br><span class="line">    dmatrix = xgb.DMatrix(numpy_array)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># predict</span></span><br><span class="line">    y = model.predict(dmatrix)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># return with pandas series</span></span><br><span class="line">    series = pd.Series(y)</span><br><span class="line">    <span class="keyword">return</span> series</span><br></pre></td></tr></table></figure>
-
-<p>Let’s say we have a dataframe <code>df</code> with following records:</p>
-<table>
-<thead>
-<tr>
-<th>features</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>[149.0, 84.0. 38.5, 79.7]</td>
-</tr>
-<tr>
-<td>[2.5, 34.0. 35.5, 97.6]</td>
-</tr>
-<tr>
-<td>[0.0, 65.3. 58.7, 45.7]</td>
-</tr>
-</tbody></table>
-<p><code>features</code> is the feature column with <code>ArrayType(FloatType())</code> and each row of <code>features</code> contains 4 feature values.</p>
-<p>When we call <code>get_prediction_result</code> function, it receives a <code>Series</code> object. In this case, it would be </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">0    [149.0, 84.0, 38.5, 79.7]</span><br><span class="line">1    [2.5, 34.0, 35.5, 97.6]</span><br><span class="line">2    [0.0, 65.3, 58.7, 45.7]</span><br><span class="line">dtype: object</span><br></pre></td></tr></table></figure>
-
-<p>We would need to convert it to a <code>DMatrix</code> object, which is the input for a XGBoost model. We first call its <code>values</code> method, which yields:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">array([list([149.0, 84.0, 38.5, 79.7]), list([2.5, 34.0, 35.5, 97.6]),</span><br><span class="line">       list([0.0, 65.3, 58.7, 45.7])], dtype&#x3D;object)</span><br></pre></td></tr></table></figure>
-
-<p>Then we call <code>tolist</code> to convert it into a list of list, yields:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[[149.0, 84.0, 38.5, 79.7], [2.5, 34.0, 35.5, 97.6], [0.0, 65.3, 58.7, 45.7]]</span><br></pre></td></tr></table></figure>
-
-<p>After that, we convert it into a 2D numpy array:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">array([[149. ,  84. ,  38.5,  79.7],</span><br><span class="line">       [  2.5,  34. ,  35.5,  97.6],</span><br><span class="line">       [  0. ,  65.3,  58.7,  45.7]])</span><br></pre></td></tr></table></figure>
-
-<p>Finally, we initialise a <code>DMatrix</code> object with the 2D numpy array we just created. We then run the prediction. As a <code>pandas_udf</code> requires a <code>Series</code> object to return, we convert the prediction scores into a <code>Series</code> at the line 16.</p>
-<h2 id="Using-a-pandas-udf-Function"><a href="#Using-a-pandas-udf-Function" class="headerlink" title="Using a pandas_udf Function"></a>Using a <code>pandas_udf</code> Function</h2><p>Using a <code>pandas_udf</code> function is just like how we use a normal <code>udf</code> function:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.withColumn(<span class="string">'prediction'</span>, get_prediction_result(<span class="string">'features'</span>))</span><br></pre></td></tr></table></figure>
-
-
-<p>That’s how we integrate the XGBoost batch prediction into our PySpark pipeline.</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/03/01/ML-Prediction-with-XGBoost-and-PySpark/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
         
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://blog.munhou.com/2020/02/10/Hyperparameters-Optimisation-with-Hyperopt-and-MLFlow-for-Tracking/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="MunHou">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Mun Hou's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/02/10/Hyperparameters-Optimisation-with-Hyperopt-and-MLFlow-for-Tracking/" class="post-title-link" itemprop="url">Hyperparameters Optimisation with Hyperopt and MLFlow for Tracking</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2020-02-10 08:49:00 / Modified: 08:50:34" itemprop="dateCreated datePublished" datetime="2020-02-10T08:49:00+00:00">2020-02-10</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus: </span>
-    
-    <a title="disqus" href="/2020/02/10/Hyperparameters-Optimisation-with-Hyperopt-and-MLFlow-for-Tracking/#comments" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/02/10/Hyperparameters-Optimisation-with-Hyperopt-and-MLFlow-for-Tracking/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
       
     </div>
 
@@ -544,10 +372,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-01-17 05:28:00 / Modified: 07:38:29" itemprop="dateCreated datePublished" datetime="2020-01-17T05:28:00+00:00">2020-01-17</time>
+              <time title="Created: 2020-01-17 05:28:00" itemprop="dateCreated datePublished" datetime="2020-01-17T05:28:00+00:00">2020-01-17</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-04-06 08:18:10" itemprop="dateModified" datetime="2020-04-06T08:18:10+00:00">2020-04-06</time>
+              </span>
 
           
   
@@ -575,36 +409,14 @@
 
       
           <h1 id="TL-DR"><a href="#TL-DR" class="headerlink" title="TL;DR"></a>TL;DR</h1><p>Uber’s Petastorm library provides a data reader for PyTorch that reads files generated by PySpark. <a href="https://github.com/mhwong2007/petastorm-demo" target="_blank" rel="noopener">Clone the project from Github for more information.</a></p>
-<h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><p>As a data scientist, I spend much time wrangling data than making models, and the data scale from hundreds of millions to billions of pieces of records. Spark has been of great use to me due to its capability to process big data. Usually, I run all the dirty jobs with Spark and generated the-ready-to-use-files for the downstream model training process.</p>
-<p>However, there is a gap between Spark and PyTorch, which is the data reader. As Spark runs in parallel, it writes multiple partitions of files by default. It’s painful that PyTorch doesn’t provide a data loader with the support of multiple files out of the box. While PyTorch gives a proper level of customisation, writing a high-efficiency data loader is not easy. Then, I found Petastorm.</p>
-<p><a href="https://github.com/uber/petastorm" target="_blank" rel="noopener">Petastorm</a> is an open-source data access library developed by Uber that provides more than a data loader. It supports multiple machine learning frameworks, such as TensorFlow, PyTorch, and PySpark. To install Petastorm, run</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install petastorm</span><br></pre></td></tr></table></figure>
-<p>Check out their <a href="https://github.com/uber/petastorm" target="_blank" rel="noopener">repository</a> for more details.</p>
-<p>In this post, I would like to demonstrate how I process data with PySpark, train a model with PyTorch and fill in the gap in between with Petastorm.</p>
-<h1 id="Data-Processing-PySpark"><a href="#Data-Processing-PySpark" class="headerlink" title="Data Processing: PySpark"></a>Data Processing: PySpark</h1><p>We use the famous Iris flower data set as part of the demonstration. We load the CSV file with PySpark and create two new columns: the <code>features</code> column by assembling all the feature vectors and the <code>label</code> column by changing the class string to an integer.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">transform_iris_data</span><span class="params">(data: DataFrame)</span>:</span></span><br><span class="line">    data = (</span><br><span class="line">        data</span><br><span class="line">        .withColumn(<span class="string">'features'</span>,</span><br><span class="line">                    assemble_features(<span class="string">'sepal-length'</span>, <span class="string">'sepal-width'</span>, <span class="string">'petal-length'</span>, <span class="string">'petal-width'</span>)</span><br><span class="line">                    )</span><br><span class="line">        .withColumn(<span class="string">'label'</span>, transform_label(<span class="string">'class'</span>))</span><br><span class="line">        .select(<span class="string">'features'</span>, <span class="string">'label'</span>)</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> data</span><br></pre></td></tr></table></figure>
-
-<p>After that, we split the data frame into the train set and test set.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">split_train_test</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        data: DataFrame, </span></span></span><br><span class="line"><span class="function"><span class="params">        train_ratio: float = <span class="number">0.7</span>, </span></span></span><br><span class="line"><span class="function"><span class="params">        test_ratio: float = <span class="number">0.3</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> data.randomSplit([train_ratio, test_ratio], seed=<span class="number">42</span>)</span><br></pre></td></tr></table></figure>
-
-<p>Finally, we save the two data frames in parquet format.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">(</span><br><span class="line">    train</span><br><span class="line">    .write</span><br><span class="line">    .mode(<span class="string">'overwrite'</span>)</span><br><span class="line">    .parquet(train_path)</span><br><span class="line">)</span><br><span class="line">(</span><br><span class="line">    test</span><br><span class="line">    .write</span><br><span class="line">    .mode(<span class="string">'overwrite'</span>)</span><br><span class="line">    .parquet(test_path)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<h1 id="PyTorch-Define-Model"><a href="#PyTorch-Define-Model" class="headerlink" title="PyTorch: Define Model"></a>PyTorch: Define Model</h1><p>We build a simple three-layer network for this easy training task.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_linear_model</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        input_dim: int = <span class="number">4</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        output_dim: int = <span class="number">3</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        device=<span class="string">'cpu'</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span>:</span></span><br><span class="line">    net = nn.Sequential(</span><br><span class="line">        nn.Linear(input_dim, <span class="number">6</span>),</span><br><span class="line">        nn.ReLU(),</span><br><span class="line">        nn.Linear(<span class="number">6</span>, <span class="number">4</span>),</span><br><span class="line">        nn.ReLU(),</span><br><span class="line">        nn.Linear(<span class="number">4</span>, output_dim)</span><br><span class="line">    ).to(device)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> net</span><br></pre></td></tr></table></figure>
-
-<h1 id="Petastorm-The-Data-Reader"><a href="#Petastorm-The-Data-Reader" class="headerlink" title="Petastorm: The Data Reader"></a>Petastorm: The Data Reader</h1><p>Now, it’s time to build the data reader. Building a data reader is simple; what we have to do is to call <code>DataLoader</code> and <code>make_batch_reader</code>, passing in the data path, batch size, and the number of the epoch.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_data_loader</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        data_path: str = None,</span></span></span><br><span class="line"><span class="function"><span class="params">        num_epochs: int = <span class="number">1</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        batch_size: int = <span class="number">16</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> data_path:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> DataLoader(</span><br><span class="line">        make_batch_reader(</span><br><span class="line">            dataset_url=data_path,</span><br><span class="line">            num_epochs=num_epochs</span><br><span class="line">        ),</span><br><span class="line">        batch_size=batch_size</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
-
-<p>Keep in mind that the <code>dataset_url</code> must consist of the URL scheme. For example, if the data path is <code>/some/localpath/a_dataset</code>, you should pass in <code>file:///some/localpath/a_dataset</code>. Petastorm also supports <code>hdfs://</code> and <code>s3://</code>, but I haven’t tried them yet.</p>
-<h1 id="Model-Training"><a href="#Model-Training" class="headerlink" title="Model Training"></a>Model Training</h1><p>The final step is to train our model.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">train_model</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        train_path: str,</span></span></span><br><span class="line"><span class="function"><span class="params">        device: str = <span class="string">'cpu'</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        num_epoch: int = <span class="number">50</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span>:</span></span><br><span class="line">    <span class="comment"># get model</span></span><br><span class="line">    model = get_linear_model()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># define loss function</span></span><br><span class="line">    loss_fun = torch.nn.CrossEntropyLoss()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># define optimiser</span></span><br><span class="line">    opt = torch.optim.Adam(model.parameters(), lr=<span class="number">0.01</span>)</span><br><span class="line"></span><br><span class="line">    model.train()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> epoch <span class="keyword">in</span> range(num_epoch):</span><br><span class="line">        batch_losses = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> batch, data <span class="keyword">in</span> enumerate(get_data_loader(train_path)):</span><br><span class="line">            opt.zero_grad()</span><br><span class="line"></span><br><span class="line">            features = data[<span class="string">'features'</span>].to(device)</span><br><span class="line">            label = data[<span class="string">'label'</span>].to(device)</span><br><span class="line"></span><br><span class="line">            y_pred = model(features)</span><br><span class="line">            loss = loss_fun(y_pred, label)</span><br><span class="line"></span><br><span class="line">            loss.backward()</span><br><span class="line">            opt.step()</span><br><span class="line"></span><br><span class="line">            <span class="comment"># track batch losses</span></span><br><span class="line">            batch_losses += loss.item()</span><br><span class="line"></span><br><span class="line">        avg_batch_loss = batch_losses / (batch + <span class="number">1</span>)</span><br><span class="line">        print(<span class="string">f'Epoch <span class="subst">&#123;epoch&#125;</span> average loss: <span class="subst">&#123;avg_batch_loss&#125;</span>'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> model</span><br></pre></td></tr></table></figure>
-
-<p>Using a Petastorm data loader is just like using a PyTorch data loader: wrap it in a for loop.<br>Remember that the data frame previously generated by PySpark consists of only two columns? We can retrieve the values by writing <code>data[&#39;features&#39;]</code> and <code>data[&#39;label&#39;]</code>. If everything goes smoothly, you get a model with the following test performance:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">                 precision    recall  f1-score   support</span><br><span class="line"></span><br><span class="line">    Iris-setosa       1.00      1.00      1.00        11</span><br><span class="line">Iris-versicolor       1.00      1.00      1.00        13</span><br><span class="line"> Iris-virginica       1.00      1.00      1.00        12</span><br><span class="line"></span><br><span class="line">       accuracy                           1.00        36</span><br><span class="line">      macro avg       1.00      1.00      1.00        36</span><br><span class="line">   weighted avg       1.00      1.00      1.00        36</span><br></pre></td></tr></table></figure>
-
-<h1 id="Final-Words"><a href="#Final-Words" class="headerlink" title="Final Words"></a>Final Words</h1><p>Petastorm is a reliable and helpful library. Be sure to check out their latest features!</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/01/17/Data-Pipeline-From-Pyspark-to-Pytorch/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -759,14 +571,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

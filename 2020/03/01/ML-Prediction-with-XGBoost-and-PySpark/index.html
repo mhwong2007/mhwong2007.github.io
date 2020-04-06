@@ -46,15 +46,15 @@
   };
 </script>
 
-  <meta name="description" content="Once a XGBoost model is trained, we would like to use PySpark for batch predictions. The method we use here is through Pandas UDF. Why pandas_udf Instead of udfFor a udf function, PySpark evaluates it">
+  <meta name="description" content="Once a XGBoost model is trained, we would like to use PySpark for batch predictions. The method we use here is through Pandas UDF.">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ML Prediction with XGBoost and PySpark">
 <meta property="og:url" content="https://blog.munhou.com/2020/03/01/ML-Prediction-with-XGBoost-and-PySpark/index.html">
 <meta property="og:site_name" content="Mun Hou&#39;s Blog">
-<meta property="og:description" content="Once a XGBoost model is trained, we would like to use PySpark for batch predictions. The method we use here is through Pandas UDF. Why pandas_udf Instead of udfFor a udf function, PySpark evaluates it">
+<meta property="og:description" content="Once a XGBoost model is trained, we would like to use PySpark for batch predictions. The method we use here is through Pandas UDF.">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-03-01T13:14:00.000Z">
-<meta property="article:modified_time" content="2020-03-01T14:05:06.277Z">
+<meta property="article:modified_time" content="2020-04-06T08:17:19.037Z">
 <meta property="article:author" content="MunHou">
 <meta property="article:tag" content="Machine Learning">
 <meta property="article:tag" content="PySpark">
@@ -210,10 +210,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-03-01 13:14:00 / Modified: 14:05:06" itemprop="dateCreated datePublished" datetime="2020-03-01T13:14:00+00:00">2020-03-01</time>
+              <time title="Created: 2020-03-01 13:14:00" itemprop="dateCreated datePublished" datetime="2020-03-01T13:14:00+00:00">2020-03-01</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-04-06 08:17:19" itemprop="dateModified" datetime="2020-04-06T08:17:19+00:00">2020-04-06</time>
+              </span>
 
           
   
@@ -242,6 +248,9 @@
       
         <p>Once a XGBoost model is trained, we would like to use PySpark for batch predictions.</p>
 <p>The method we use here is through Pandas UDF.</p>
+<a id="more"></a>
+
+
 <h2 id="Why-pandas-udf-Instead-of-udf"><a href="#Why-pandas-udf-Instead-of-udf" class="headerlink" title="Why pandas_udf Instead of udf"></a>Why <code>pandas_udf</code> Instead of <code>udf</code></h2><p>For a <code>udf</code> function, PySpark evaluates it one record at a time, which is the slowest possible way to execute the prediction. While for a <code>pandas_udf</code> function, it takes a bunch of pandas <code>Series</code> and returns a <code>Series</code>, which is vectorised.</p>
 <h2 id="Create-a-pandas-udf-Prediction-Function"><a href="#Create-a-pandas-udf-Prediction-Function" class="headerlink" title="Create a pandas_udf Prediction Function"></a>Create a <code>pandas_udf</code> Prediction Function</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@pandas_udf(FloatType())</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_prediction_result</span><span class="params">(features)</span>:</span></span><br><span class="line">    <span class="comment"># convert to 2D-numpy array</span></span><br><span class="line">    numpy_array = np.array(</span><br><span class="line">        features</span><br><span class="line">        .values</span><br><span class="line">        .tolist()</span><br><span class="line">    )</span><br><span class="line">    <span class="comment"># convert to xgboost dmatrix</span></span><br><span class="line">    dmatrix = xgb.DMatrix(numpy_array)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># predict</span></span><br><span class="line">    y = model.predict(dmatrix)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># return with pandas series</span></span><br><span class="line">    series = pd.Series(y)</span><br><span class="line">    <span class="keyword">return</span> series</span><br></pre></td></tr></table></figure>
 
@@ -300,8 +309,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/02/10/Hyperparameters-Optimisation-with-Hyperopt-and-MLFlow-for-Tracking/" rel="prev" title="Hyperparameters Optimisation with Hyperopt and MLFlow for Tracking">
-      <i class="fa fa-chevron-left"></i> Hyperparameters Optimisation with Hyperopt and MLFlow for Tracking
+    <a href="/2020/01/17/Data-Pipeline-From-Pyspark-to-Pytorch/" rel="prev" title="Data Pipeline: From PySpark to PyTorch">
+      <i class="fa fa-chevron-left"></i> Data Pipeline: From PySpark to PyTorch
     </a></div>
       <div class="post-nav-item">
     <a href="/2020/04/06/Pytorch-Implementation-of-Deep-Packet-A-Novel-Approach-For-Encrypted-Tra%EF%AC%83c-Classi%EF%AC%81cation-Using-Deep-Learning/" rel="next" title="Pytorch Implementation of Deep Packet: A Novel Approach For Encrypted Traﬃc Classiﬁcation Using Deep Learning">
@@ -387,14 +396,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
